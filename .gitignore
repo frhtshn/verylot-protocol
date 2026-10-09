@@ -1,0 +1,8 @@
+bin/
+obj/
+node_modules/
+dist/
+*.user
+.vs/
+# Reference generator state: contains secret day roots.
+data/

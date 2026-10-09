@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <PackageId>Verylot.Core</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Ferhat Şahin</Authors>
+    <Description>Reference implementation of the Verylot protocol v1: seed chains, drand quicknet rounds and unbiased digit derivation.</Description>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/frhtshn/verylot-protocol</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/frhtshn/verylot-protocol</RepositoryUrl>
+    <PackageTags>provably-fair;randomness;drand;commit-reveal</PackageTags>
+  </PropertyGroup>
+
+</Project>

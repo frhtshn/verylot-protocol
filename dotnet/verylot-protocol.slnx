@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Verylot.Core.Tests/Verylot.Core.Tests.csproj" />
+  <Project Path="Verylot.Core/Verylot.Core.csproj" />
+  <Project Path="Verylot.Reference/Verylot.Reference.csproj" />
+</Solution>
