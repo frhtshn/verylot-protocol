@@ -10,6 +10,8 @@ Anyone can recompute and verify every digit. See [SPEC.md](SPEC.md) for the full
 This repository is the open engine behind [verylot.online](https://verylot.online). It contains everything needed to
 **verify** Verylot's digits, and to **run your own** digit stream.
 
+![verylot.online: the live digit stream](docs/verylot-home.png)
+
 | Path | What it is |
 |---|---|
 | [`SPEC.md`](SPEC.md) | Protocol v1: slots, seed chain, drand round, digit derivation, HTTP interface |
