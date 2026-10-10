@@ -12,7 +12,11 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/frhtshn/verylot-protocol</PackageProjectUrl>
     <RepositoryUrl>https://github.com/frhtshn/verylot-protocol</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>provably-fair;randomness;drand;commit-reveal</PackageTags>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
 </Project>

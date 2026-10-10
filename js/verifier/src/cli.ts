@@ -1,14 +1,18 @@
 /**
  * verylot-verify — verify Verylot digits without trusting the Verylot website.
  *
- *   verylot-verify --api https://api.verylot.online --at 2026-10-05T12:00:00Z --digits 6
- *   verylot-verify --file verylot-proof.json
+ *   verylot-verify --file verylot-proof.json          (the proof downloaded from the site's Verify window)
+ *   verylot-verify --api https://api.verylot.online --key vk_7Qm2xR9a --pem verylot.pem --at 2026-10-05T12:00:00Z --digits 6
+ *
+ * verylot.online's API is for members: --key and --pem sign the requests (Ed25519 private key). A self-hosted
+ * reference generator needs neither.
  *
  * Exit code 0 = every digit verified, 1 = at least one failed, 2 = usage / input error.
  */
+import { createHash, createPrivateKey, randomBytes, sign } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { parseArgs } from 'node:util'
-import { fetchProofBundle } from './api.js'
+import { fetchProofBundle, type RequestHeaders } from './api.js'
 import { slotAtOrAfter } from './protocol.js'
 import { verifyBundle, type ProofBundle, type SlotVerification } from './verify.js'
 
@@ -18,9 +22,25 @@ const { values } = parseArgs({
     at: { type: 'string' },
     digits: { type: 'string', default: '6' },
     file: { type: 'string' },
+    key: { type: 'string' },
+    pem: { type: 'string' },
     json: { type: 'boolean', default: false },
   },
 })
+
+/** The member API's signature headers: Ed25519 over METHOD \n path?query \n timestamp \n nonce \n hex sha256(body). */
+async function signer(keyId: string, pemFile: string): Promise<RequestHeaders> {
+  const key = createPrivateKey(await readFile(pemFile, 'utf8'))
+  return path => {
+    const ts = new Date().toISOString().replace(/\.\d+Z$/, 'Z')
+    const nonce = randomBytes(16).toString('base64url')
+    const text = ['GET', path, ts, nonce, createHash('sha256').update('').digest('hex')].join('\n')
+    return {
+      'X-Verylot-Key': keyId, 'X-Verylot-Timestamp': ts, 'X-Verylot-Nonce': nonce,
+      'X-Verylot-Signature': sign(null, Buffer.from(text), key).toString('base64'),
+    }
+  }
+}
 
 const ok = (b: boolean) => (b ? '✓' : '✗')
 
@@ -44,9 +64,12 @@ async function main(): Promise<number> {
   } else if (values.at) {
     const at = new Date(values.at.endsWith('Z') || /[+-]\d\d:\d\d$/.test(values.at) ? values.at : `${values.at}Z`)
     if (Number.isNaN(at.getTime())) throw new Error(`--at is not a valid time: ${values.at}`)
-    bundle = await fetchProofBundle(values.api!, slotAtOrAfter(at), Number(values.digits))
+    if (!values.key !== !values.pem) throw new Error('--key and --pem go together (the key id and its private key file)')
+    // Verylot's API answers members only (signed); a self-hosted reference generator needs no key.
+    const headers = values.key && values.pem ? await signer(values.key, values.pem) : undefined
+    bundle = await fetchProofBundle(values.api!, slotAtOrAfter(at), Number(values.digits), headers)
   } else {
-    console.error('usage: verylot-verify (--at <UTC time> [--digits 6] [--api <url>] | --file <proof.json>) [--json]')
+    console.error('usage: verylot-verify (--file <proof.json> | --at <UTC time> [--digits 6] [--api <url>] [--key <key id> --pem <private key>]) [--json]')
     return 2
   }
 

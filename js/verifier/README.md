@@ -12,9 +12,12 @@ For every digit it checks:
 ## CLI
 
 ```bash
-node dist/cli.js --api https://api.verylot.online --at 2026-10-05T12:00:00Z --digits 6
-node dist/cli.js --file verylot-proof.json          # proof file downloaded from the site
+node dist/cli.js --file verylot-proof.json          # proof file downloaded from the site's Verify window
+node dist/cli.js --api https://api.verylot.online --key vk_7Qm2xR9a --pem verylot.pem --at 2026-10-05T12:00:00Z --digits 6
 ```
+
+verylot.online's API is for members: `--key` (the key id) and `--pem` (its Ed25519 private key, made in the member
+panel) sign the requests. A self-hosted reference generator (`dotnet/Verylot.Reference`) needs neither.
 
 Exit code `0` = all digits verified, `1` = at least one failed, `2` = input error.
 
@@ -23,7 +26,8 @@ Exit code `0` = all digits verified, `1` = at least one failed, `2` = input erro
 ```ts
 import { verifyRange, verifyBundle } from '@verylot/verifier'
 
-const { results } = await verifyRange('https://api.verylot.online', startSlot, 6)
+// headers(pathAndQuery) returns the member signature headers for each request (see src/cli.ts, signer).
+const { results } = await verifyRange('https://api.verylot.online', startSlot, 6, { headers })
 results.every(r => r.ok)
 ```
 

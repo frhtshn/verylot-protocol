@@ -6,3 +6,4 @@ dist/
 .vs/
 # Reference generator state: contains secret day roots.
 data/
+artifacts/
